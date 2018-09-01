@@ -1,0 +1,33 @@
+Given a non-empty array of integers, every element appears twice except for one. Find that single one.
+
+Note:
+
+Your algorithm should have a linear runtime complexity. Could you implement it without using extra memory?
+
+Example 1:
+
+Input: [2,2,1]
+Output: 1
+Example 2:
+
+Input: [4,1,2,1,2]
+Output: 4
+
+
+/*
+  其余所有的数字都是两两配对的，因此如果把所有的数字都经过“异或”运算，
+  只有那个只出现1次的数字的二进制表示的1所在的位置是1，其余都是0.因此结果就是那个1次出现的数字。
+*/
+
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int length = nums.size();
+        int ans = 0;
+        for(int i = 0; i < length; i++){
+            ans = ans^nums[i];
+        }
+        return ans;
+    }
+};
+
