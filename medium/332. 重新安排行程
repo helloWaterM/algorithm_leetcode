@@ -1,0 +1,121 @@
+给定一个机票的字符串二维数组 [from, to]，子数组中的两个成员分别表示飞机出发和降落的机场地点，对该行程进行重新规划排序。所有这些机票都属于一个从JFK（肯尼迪国际机场）出发的先生，所以该行程必须从 JFK 出发。
+说明:
+如果存在多种有效的行程，你可以按字符自然排序返回最小的行程组合。例如，行程 ["JFK", "LGA"] 与 ["JFK", "LGB"] 相比就更小，排序更靠前
+所有的机场都用三个大写字母表示（机场代码）。
+假定所有机票至少存在一种合理的行程。
+示例 1:
+输入: [["MUC", "LHR"], ["JFK", "MUC"], ["SFO", "SJC"], ["LHR", "SFO"]]
+输出: ["JFK", "MUC", "LHR", "SFO", "SJC"]
+示例 2:
+输入: [["JFK","SFO"],["JFK","ATL"],["SFO","ATL"],["ATL","JFK"],["ATL","SFO"]]
+输出: ["JFK","ATL","JFK","SFO","ATL","SFO"]
+解释: 另一种有效的行程是 ["JFK","SFO","ATL","JFK","ATL","SFO"]。但是它自然排序更大更靠后。
+
+/*
+### 使用DFS求解
+对图中的每条边进行遍历
+### 注意点
+1. dfs中，开始把点加入路径，在回退的时候，无论哪个出口都需要把点从路径中去掉。
+2. 图中，路径可能是可以重复多条的。
+3. map中的value 为int的时候，默认初始化为0
+4. vector可以只初始化第一维的长度。
+*/
+
+class Solution {
+private:
+    map<string, int> airportMap;
+    vector<string> airportMapVector; 
+    map<pair<int, int>, int> visited;
+    vector<int> pathNum;
+    
+public:
+    vector<string> findItinerary(vector<pair<string, string>> tickets) {
+        vector<vector<int>> graph(2000); 
+        init(tickets, graph);
+        string start = "JFK";
+        int startNum = airportMap[start];
+        dfs(startNum, graph);
+        vector<string> res;
+     //   cout << pathNum.size()<<endl;
+        cout << airportMapVector.size();
+        for(int i = 0; i < pathNum.size(); i++){
+            res.push_back(airportMapVector[pathNum[i]]);
+        }
+        return res;
+    }
+    
+    bool static cmp(const string &x,const string &y) 
+    {
+        return x<y;
+    }
+    
+    bool dfs(int num, vector<vector<int>>& graph){
+        cout << "stat" <<num <<endl;
+        int isEnd = true;
+        pathNum.push_back(num); 
+        sort(graph[num].begin(), graph[num].end());
+      //  cout <<"num:" <<num<<endl;
+     //   cout << "size:"<<graph[num].size();
+        for(int i = 0; i < graph[num].size(); i++){
+            pair<int, int> edge(num, graph[num][i]);
+            if(visited[edge] > 0){
+                isEnd = false;
+                visited[edge]--;
+                if(dfs(graph[num][i], graph) == false){
+                    visited[edge]++;
+                    continue;
+                }
+                else{
+                    return true;
+                }
+            }
+            
+        }
+        
+        if(isEnd = true){
+          //  cout << "num" << num << endl;
+         //   cout << "end" <<endl;
+            for(map<pair<int, int>, int>::iterator it = visited.begin(); it!= visited.end(); it++){
+                if(it->second > 0){
+                    pathNum.pop_back();
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        cout <<pathNum.back()<<endl;
+        pathNum.pop_back();
+        return false;
+    }
+    
+    void init(vector<pair<string, string>>& tickets, vector<vector<int>>& graph){
+        
+        for(int i = 0; i < tickets.size(); i++){
+            if(find(airportMapVector.begin(), airportMapVector.end(), tickets[i].first) == airportMapVector.end()){
+                airportMapVector.push_back(tickets[i].first);
+            }
+            if(find(airportMapVector.begin(), airportMapVector.end(), tickets[i].second) == airportMapVector.end()){
+                airportMapVector.push_back(tickets[i].second);
+            }
+        }
+        sort(airportMapVector.begin(), airportMapVector.end(), cmp);
+        
+        for(int i = 0; i < airportMapVector.size(); i++){
+            airportMap[airportMapVector[i]] = i; 
+            cout <<airportMapVector[i] << " ";
+        }
+        for(int i = 0; i < tickets.size(); i++){
+            int f = airportMap[tickets[i].first];
+            int e = airportMap[tickets[i].second];
+            cout <<endl;
+            cout <<"f"<<f<<endl;
+            cout <<"e"<<e<<endl;
+            graph[f].push_back(e);
+            pair<int, int> edge(f, e);
+            visited[edge] ++;  
+        }
+        cout <<"done init"<<endl;
+    }
+        
+};
