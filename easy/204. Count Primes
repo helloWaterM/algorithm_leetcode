@@ -1,0 +1,41 @@
+Count the number of prime numbers less than a non-negative number, n.
+
+Example:
+
+Input: 10
+Output: 4
+Explanation: There are 4 prime numbers less than 10, they are 2, 3, 5, 7.
+
+/*
+    埃拉托斯特尼筛法
+    对2 - sqrt(n, 2) 的数进行取倍数遍历（遍历到n为止）
+    是素数的标记 true，
+    不是的标记为false
+    数一下true的个数
+    初始化都为true，除了 0，1两个数字
+*/
+
+class Solution {
+
+    
+public:
+    int countPrimes(int n) {
+        if(n == 0 || n==1|| n== 2) return 0;
+        vector<int> M(n, 1); 
+        M[1] = M[0] = 2; M[2] = 1;
+        int m = sqrt(n);
+        for(int i = 2; i <= m; i++){
+            if(M[i] == 2){
+                continue;  
+            }
+            M[i] = 1;
+            int t = i;
+            while(t + i < n){
+                t = t + i;
+                M[t] = 2;
+            }   
+        }
+        int ans = count(M.begin(), M.end(), 1);
+        return ans;
+    }
+};
