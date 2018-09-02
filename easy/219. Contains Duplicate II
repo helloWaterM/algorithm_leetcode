@@ -1,0 +1,41 @@
+Given an array of integers and an integer k, find out whether there are two distinct indices i and j in the array such that nums[i] = nums[j] and the absolute difference between i and j is at most k.
+
+Example 1:
+
+Input: nums = [1,2,3,1], k = 3
+Output: true
+Example 2:
+
+Input: nums = [1,0,1,1], k = 1
+Output: true
+Example 3:
+
+Input: nums = [1,2,3,1,2,3], k = 2
+Output: false
+
+/*
+把所有的值所在的下标定位到最前面（最右边）的位置
+用hash_map(unordered_map) 判断当前下表的元素是否有相同的，
+并且相同的元素中最靠近的位置是否是规定范围之内即可判断是否符合题目要求
+*/
+
+
+class Solution {
+private:
+    unordered_map<int, int> M;
+public:
+    bool containsNearbyDuplicate(vector<int>& nums, int k) {
+        if(nums.size() == 1){
+            return false;
+        }
+        for(int i = 0; i < nums.size(); i++){
+            if(M.find(nums[i]) != M.end()){ //can find
+                if(i - M[nums[i]] <= k){
+                    return true;
+                }
+            }
+            M[nums[i]] = i;
+        }
+        return false;
+    }
+};
