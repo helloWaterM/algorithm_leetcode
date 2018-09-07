@@ -1,0 +1,77 @@
+给定一种 pattern(模式) 和一个字符串 str ，判断 str 是否遵循相同的模式。
+
+这里的遵循指完全匹配，例如， pattern 里的每个字母和字符串 str 中的每个非空单词之间存在着双向连接的对应模式。
+
+示例1:
+
+输入: pattern = "abba", str = "dog cat cat dog"
+输出: true
+示例 2:
+
+输入:pattern = "abba", str = "dog cat cat fish"
+输出: false
+示例 3:
+
+输入: pattern = "aaaa", str = "dog cat cat dog"
+输出: false
+示例 4:
+
+输入: pattern = "abba", str = "dog dog dog dog"
+输出: false
+说明:
+你可以假设 pattern 只包含小写字母， str 包含了由单个空格分隔的小写字母。
+
+/*
+  使用两个Map，<string, string>第一个建立 pattern -> str 的映射关系，判定pattern 和 str是否对应
+              <string, int>第二个是用来确定 不同的 pattern对应的str是不同的。
+*/
+class Solution {
+public:
+    bool wordPattern(string pattern, string str) {
+        unordered_map<string, string> M;
+        unordered_map<string, int> M2;
+        vector<string> strVec = this->split(str, ' ');
+        // for(vector<string>::iterator it = strVec.begin(); it != strVec.end(); it++){
+        //     cout << *it<<endl;
+        // }
+        if(pattern.size() != strVec.size()) return false;
+        for(int i = 0; i < pattern.size(); i++){
+            string p = pattern.substr(i, 1);
+            unordered_map<string, string>::iterator it = M.find(p);
+            if(it == M.end()){
+                if(M2.find(strVec[i]) == M2.end()){
+                    M[p] = strVec[i];
+                    M2[strVec[i]] = 1;
+                }
+                else
+                    return false;
+            }
+            else{
+                cout << p<<endl;
+                cout << strVec[i] <<endl;
+                if(M[p] != strVec[i])
+                    return false;
+            }
+        }
+        return true;
+    }
+    
+    vector<string> split(string str, char spC){
+        vector<string> ans;
+        string tmp; int bg = 0; int len = 0;
+        for(int i = 0; i < str.size(); i++){
+            if(str[i] != ' '){
+                len ++;
+            }
+            else{
+                tmp = str.substr(bg, len);
+                ans.push_back(tmp);
+                len = 0;
+                bg = i + 1;
+            }
+        }
+        tmp = str.substr(bg, len);
+        ans.push_back(tmp);
+        return ans;
+    }
+};
