@@ -7,6 +7,8 @@
 输入：14
 输出：False
 
+方法一
+
 class Solution {
 public:
     bool isPerfectSquare(int num) {
@@ -27,3 +29,26 @@ public:
         return false;
     }
 };
+
+方法二 (二分法)
+注意： 整数相除，结果为缩水的整数
+class Solution {
+public:
+    bool isPerfectSquare(int num) {
+        if(num < 0) return false;
+        int left = 0;
+        int right = num;
+        
+        while(right >= left){
+            long long mid = (left + right) / 2;
+            cout <<left<<" " << right <<endl;
+            if(mid * mid == num) {return true;}
+            else if(mid * mid < num) {left = mid + 1;}
+            else{
+                right = mid -1;
+            }
+        }
+        return false;
+    }
+};
+   
