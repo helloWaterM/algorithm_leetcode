@@ -1,0 +1,82 @@
+运用你所掌握的数据结构，设计和实现一个  LRU (最近最少使用) 缓存机制。它应该支持以下操作： 获取数据 get 和 写入数据 put 。
+获取数据 get(key) - 如果密钥 (key) 存在于缓存中，则获取密钥的值（总是正数），否则返回 -1。
+写入数据 put(key, value) - 如果密钥不存在，则写入其数据值。当缓存容量达到上限时，它应该在写入新数据之前删除最近最少使用的数据值，从而为新的数据值留出空间。
+进阶:
+你是否可以在 O(1) 时间复杂度内完成这两种操作？
+示例:
+LRUCache cache = new LRUCache( 2 /* 缓存容量 */ );
+
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);       // 返回  1
+cache.put(3, 3);    // 该操作会使得密钥 2 作废
+cache.get(2);       // 返回 -1 (未找到)
+cache.put(4, 4);    // 该操作会使得密钥 1 作废
+cache.get(1);       // 返回 -1 (未找到)
+cache.get(3);       // 返回  3
+cache.get(4);       // 返回  4
+
+LRU算法:
+1.get的数据，放到队首
+2.put的数据，如果原来存在，那么删除原来的，把现在的放到队首
+            如果原来不存在，容量够的情况下，直接添加到队首
+                           容量不够的情况下，删去队尾的数据，添加到队首
+
+
+class LRUCache {
+private:
+    list<pair<int, int>> L;  //存储的列表（用列表存储是方便删除）
+    unordered_map<int, list<pair<int, int>>::iterator> M;
+    int capacity;  //容量
+    int contain;  //实际存储了多少个
+public:
+    LRUCache(int capacity) {
+        this->capacity = capacity;
+        this->contain = 0;
+        int time = 0;
+    }
+    
+    int get(int key) {
+        if(M.find(key) == M.end()) { return -1;}
+        else{
+            list<pair<int, int>>::iterator it = M[key];
+            int value = it->second;
+            L.erase(it);
+            L.push_front(pair<int, int>(key, value));
+            M[key] = L.begin();
+            return value;
+        }
+    }
+    
+    void put(int key, int value) {
+        if(M.find(key) != M.end()){ //如果key已经存在
+            list<pair<int, int>>::iterator it = M[key]; 
+            L.erase(it);
+            L.push_front(pair<int, int>(key, value));
+            M[key] = L.begin();
+        }
+        else{               //如果key不存在
+            if(this->contain < capacity){
+                L.push_front(pair<int, int>(key, value));
+                list<pair<int, int>>::iterator it = L.begin();
+                M[key] = it;
+                contain ++;
+            }
+            else{
+                int pop_key = L.back().first;
+                M.erase(pop_key);
+                L.pop_back();
+                L.push_front(pair<int, int>(key, value));
+                list<pair<int, int>>::iterator it = L.begin();
+                M[key] = it;
+            }
+        }
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache obj = new LRUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */
