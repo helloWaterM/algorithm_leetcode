@@ -1,0 +1,33 @@
+给定一个字符串，找到它的第一个不重复的字符，并返回它的索引。如果不存在，则返回 -1。
+
+案例:
+
+s = "leetcode"
+返回 0.
+
+s = "loveleetcode",
+返回 2.
+ 
+
+注意事项：您可以假定该字符串只包含小写字母。
+
+class Solution {
+private:
+    unordered_map<char, int> M;
+    unordered_map<char, int> D;
+public:
+    int firstUniqChar(string s) {
+        for(int i = 0; i < s.size(); i++){
+            M[s[i]] ++;
+            if(M[s[i]] == 2){
+                D[s[i]] = 1;
+            }
+        }
+        for(int i = 0 ; i < s.size(); i++){
+            if(D.find(s[i]) == D.end()){
+                return i;
+            }
+        }
+        return -1;
+    }
+};
