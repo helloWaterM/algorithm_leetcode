@@ -1,0 +1,53 @@
+给定一个字符串，验证它是否是回文串，只考虑字母和数字字符，可以忽略字母的大小写。
+
+说明：本题中，我们将空字符串定义为有效的回文串。
+
+示例 1:
+
+输入: "A man, a plan, a canal: Panama"
+输出: true
+示例 2:
+
+输入: "race a car"
+输出: false
+
+/*
+  从尾部扫描，也要注意判断是否可以找到，一定要是找到了，才是找到了。没有找到，或者找错了，都是要判断为false的
+*/
+
+public:
+    bool isPalindrome(string s) {
+        int length = s.size();
+        int j = length - 1;
+        for(int i = 0; i < length; i++){
+            char ch = s[i];
+            if(ch >= 'A' && ch <= 'Z'){ ch = ch - 'A' + 'a';}
+            if((ch >='a' && ch <= 'z') ||(ch >= '0' && ch <= '9')){
+                cout <<i<<":"<<ch <<endl;
+            }
+            else{
+                continue;
+            }
+            
+            char ct;
+            for(; j >= i; j--){
+                ct = s[j];
+                if(ct >= 'A' && ct <= 'Z'){ ct = ct - 'A' + 'a';}
+                if((ct >='a' && ct <= 'z') ||(ct >= '0' && ct <= '9')){
+                    //cout <<i<<"!"<<ct <<endl;
+                    if(ch != ct) return false;
+                    else{
+                        j--; break;
+                    }
+                }
+                else{
+                    if( j == i) return false;
+                    else{
+                       continue; 
+                    }
+                }
+            }
+        }
+        return true;
+    }
+};
