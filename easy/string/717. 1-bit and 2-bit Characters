@@ -1,0 +1,62 @@
+We have two special characters. The first character can be represented by one bit 0. The second character can be represented by two bits (10 or 11).
+
+Now given a string represented by several bits. Return whether the last character must be a one-bit character or not. The given string will always end with a zero.
+
+Example 1:
+Input: 
+bits = [1, 0, 0]
+Output: True
+Explanation: 
+The only way to decode it is two-bit character and one-bit character. So the last character is one-bit character.
+Example 2:
+Input: 
+bits = [1, 1, 1, 0]
+Output: False
+Explanation: 
+The only way to decode it is two-bit character and two-bit character. So the last character is NOT one-bit character.
+Note:
+
+1 <= len(bits) <= 1000.
+bits[i] is always 0 or 1.
+
+
+class Solution {
+public:
+    bool isOneBitCharacter(vector<int>& bits) {
+        int length = bits.size();
+        if(length < 2) return true;
+        if(bits[length - 2 ] == 0) return true; //如果是00结尾
+        //判断false， 10情况，判断 0 ~ length -2 是否可以被组成
+        return canDecompose(bits, length - 2);        
+    }
+    bool canDecompose(vector<int>& bits, int tail){
+        if(tail < 0) return true;
+        else if(tail == 0){
+            if(bits[tail] == 1){
+                return false;
+            }
+            else{return true;}
+        }
+        else{
+            if(bits[tail] == 1){
+                if(bits[tail - 1] == 0) return false;
+                else{
+                    return canDecompose(bits, tail - 2);
+                }
+            }
+            else{ // 0
+                bool can = canDecompose(bits, tail - 1); //认为是单个字符组成的形式
+                bool can_2 = false;
+                if(bits[tail - 1] == 1){ //也可以认为是2个字符组成的形式
+                    can_2 = canDecompose(bits, tail - 2); // 10形式，判断前一段
+                }
+                if(can == true || can_2 == true){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+    }
+};
