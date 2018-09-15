@@ -1,0 +1,65 @@
+给定两个二进制字符串，返回他们的和（用二进制表示）。
+
+输入为非空字符串且只包含数字 1 和 0。
+
+示例 1:
+
+输入: a = "11", b = "1"
+输出: "100"
+示例 2:
+
+输入: a = "1010", b = "1011"
+输出: "10101"
+
+/*
+  注意点： 从字符串的尾部开始进行相加，分为和为0，1，2，3，四种可能性
+*/
+
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        int aLen = a.size(); int bLen = b.size();
+        int minLen = aLen > bLen? bLen: aLen;
+        string ans = "";
+        int hbit = 0;
+        for(int i = 0; i < minLen; i++){
+            int abit = a[aLen -i - 1] - '0'; int bbit = b[bLen - i - 1] - '0';
+            int res = abit + bbit + hbit;
+            if(res == 1){
+                ans = "1" + ans;
+                hbit = 0;
+            }
+            else if(res == 2){
+                ans = "0" + ans;
+                hbit = 1;
+            }
+            else if(res == 3){
+                ans = "1" + ans;
+                hbit = 1;
+            }
+            else{
+                ans = "0" + ans;
+                hbit = 0;
+            }
+        }
+        string maxStr = aLen > bLen? a:b;
+        int maxLen = maxStr.size();
+        for(int i = minLen; i < maxStr.size(); i++){
+            int mbit = maxStr[maxLen - i - 1] - '0'; int res = mbit + hbit;
+            if(res == 1){
+                ans = "1" + ans;
+                hbit = 0;
+            }
+            else if(res == 2){
+                ans = "0" + ans;
+                hbit = 1;
+            }
+            else{
+                ans = "0" + ans;
+                hbit = 0;
+            }
+        }
+        if(hbit == 1){ans = "1" + ans;}
+        return ans;
+    }
+};
