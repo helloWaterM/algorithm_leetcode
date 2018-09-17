@@ -1,0 +1,181 @@
+Given a list of unique words, find all pairs of distinct indices (i, j) in the given list, so that the concatenation of the two words, i.e. words[i] + words[j] is a palindrome. 
+Example 1:
+Given words = ["bat", "tab", "cat"]
+Return [[0, 1], [1, 0]]
+The palindromes are ["battab", "tabbat"]
+Example 2:
+Given words = ["abcd", "dcba", "lls", "s", "sssll"]
+Return [[0, 1], [1, 0], [3, 2], [2, 4]]
+The palindromes are ["dcbaabcd", "abcddcba", "slls", "llssssll"]
+Credits:
+Special thanks to @dietpepsi for adding this problem and creating all test cases.
+
+/*
+  好的解法，使用前缀和后缀，再利用hash寻找所需的反转字符串
+*/
+//O(n*m*m)
+
+
+class Solution {
+private:
+    unordered_map<string, int> M;
+    
+public:
+    vector<vector<int>> palindromePairs(vector<string>& words) {
+        vector<vector<int>> ans;
+        for(int i = 0; i < words.size(); i++){
+            M[words[i]] = i;
+        }
+        //下面的操作非常精致，长串配短串，相同的串是只匹配右边（或者左边）
+        for(int i = 0; i < words.size(); i++){
+            string word = words[i];
+            int wl = word.size();
+            for(int j = 0; j <= wl; j++){
+                string str1 = word.substr(0, j);
+                string str2 = word.substr(j, wl - j);
+                if(isPalindrome(str1)){
+                    string str2_r = str2;
+                    reverse(str2_r.begin(), str2_r.end());
+                    if(M.find(str2_r) != M.end() && M[str2_r] != i){
+                        vector<int> part_ans; part_ans.push_back(M[str2_r]); part_ans.push_back(i);
+                        ans.push_back(part_ans);
+                    }
+                }
+                if(isPalindrome(str2) && str2 != ""){ //相同长度下，不匹配右边
+                    string str1_r = str1;
+                    reverse(str1_r.begin(), str1_r.end());
+                    if(M.find(str1_r) != M.end() && M[str1_r] != i){
+                        vector<int> part_ans; part_ans.push_back(i); part_ans.push_back(M[str1_r]);
+                        ans.push_back(part_ans);
+                    } 
+                }
+            }
+        }
+        return ans;
+    }
+    bool isPalindrome(string s){
+        int len = s.size();
+        if(len == 0) return true;
+        int j = len - 1;
+        for(int i = 0;  i <= j;){
+            if(s[i++] != s[j--]){
+                return false;
+            }
+        }   
+        return true;
+    }
+};
+
+
+
+
+/*
+  一开始的解法，在n这个层面上，还是采用了两两配对的方式。在最费时间的层面上没有使用hash，因此会超时
+*/
+//O(n^2*m^2)
+
+class Solution {
+private:
+    //存储每个中心点对应开始位置
+    unordered_map<int, int> MO[10000]; // 奇数个数时候，中间位置，向右偏移距离
+    unordered_map<int, int> ME[10000]; // 偶数个数时候，中间位置，向右偏移距离
+    //存储长度
+    unordered_map<int, int> LM;
+    //存储是否已经加入了
+    unordered_map<string, bool> CM;
+    
+public:
+    vector<vector<int>> palindromePairs(vector<string>& words) {
+        int n = words.size();
+        vector<vector<int>> ans;
+        //caculate LM, MO, ME
+        for(int i = 0; i < n; i++){
+            int m = words[i].size();
+            LM[i] = m;
+            string word = words[i];
+            for(int j = 0; j < m; j++){
+                 for(int s = 1; ; s++){
+                     if(j - s < 0 || j + s >= m) {
+                         MO[i][j] = s; break;
+                     }
+                     if(word[j + s] != word[j - s]){
+                         MO[i][j] = s; break;
+                     }
+                 }          
+            }
+            for(int j = 0; j < m; j++){
+                for( int s = 1; ; s++){
+                    if( (j - s + 1) < 0 || j + s >= m){
+                        ME[i][j] = s; break;
+                    }
+                    if(word[j + s] != word[j - s + 1]){
+                        ME[i][j] = s; break;
+                    }
+                }    
+            } 
+        }
+        
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                if(i == j) continue;
+                vector<int> ans_part; ans_part.push_back(i); ans_part.push_back(j);
+                stringstream streamj; streamj << j; stringstream streami; streami << i;
+                string key = streami.str() + "_" + streamj.str();
+                if(CM.find(key) != CM.end()) continue;
+                
+                int lenA = LM[i]; int lenB = LM[j]; 
+                int Odd = (lenA + lenB) % 2;
+                string mer = words[i] + words[j];
+                int tail;
+                if(Odd == 1){
+                    int mid = (lenA + lenB) / 2;
+                    if(mid - lenA >= 0){ //取B中
+                        tail = MO[j][mid - lenA] + mid;
+                    }
+                    else{ //取 A中
+                        tail = MO[i][mid];
+                    }
+                    if(this->judge(mer, tail, lenA + lenB) == true){
+                        ans.push_back(ans_part);
+                    }    
+                }
+                else{ //Odd == 2
+                    int mid = (lenA + lenB) / 2 - 1;
+                    if(mid - lenA >= 0){ //取B中
+                        tail = ME[j][mid - lenA] + mid;
+                    }
+                    else{ //取 A中
+                        tail = ME[i][mid];
+                    }
+                    if(this->judge(mer, tail, lenA + lenB) == true){
+                        ans.push_back(ans_part);
+                        if(lenA == lenB){
+                            vector<int> ans_part; ans_part.push_back(j); ans_part.push_back(i);    
+                            ans.push_back(ans_part);
+                            stringstream streamj; streamj << j; stringstream streami; streami << i;
+                            string key = streamj.str() + "_" + streami.str();
+                            CM[key] = true;
+                        }
+                    } 
+                }
+            }        
+        }
+        return ans;
+    }
+    
+    bool judge(string s, int tail, int len){
+        //if(len == 0) return true;
+        if(tail >= len) return true;
+        int front;
+        front = len - tail - 1;
+        for(int i = 0; tail + i < len; i++){
+            if(s[front - i] != s[tail + i]){
+                return false;
+            }
+        }   
+        return true;
+    }
+};
+
+
+
