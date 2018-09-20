@@ -13,7 +13,7 @@
 
 /*
   dfs 暴力枚举
-  另外 (auto x: string) 可以帮忙遍历字符串
+  另外 (auto x: string) 可以帮忙遍历字符串, for(auto x: ) 可以用来遍历容器
 */
 
 class Solution {
