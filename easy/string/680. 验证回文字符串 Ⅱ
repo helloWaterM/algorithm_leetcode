@@ -1,0 +1,48 @@
+给定一个非空字符串 s，最多删除一个字符。判断是否能成为回文字符串。
+
+示例 1:
+
+输入: "aba"
+输出: True
+示例 2:
+
+输入: "abca"
+输出: True
+解释: 你可以删除c字符。
+注意:
+
+字符串只包含从 a-z 的小写字母。字符串的最大长度是50000。
+/*
+  先把完全正确的情况判断掉，再判断需要去除一个字符的情况
+  判断到不同的字符的时候，去掉一边试试（去掉左边和右边的都试一下），如果都不行，返回false；有一个可行，返回true
+*/
+
+class Solution {
+public:
+    bool validPalindrome(string s) {
+        int lenS = s.size();
+        int leftInd = isPalindrome(s, 0, lenS - 1); 
+        if(leftInd == -1) return true;
+        else{
+            int rightInd = lenS - 1 - leftInd;
+            int canChooseleft = isPalindrome(s, leftInd, rightInd - 1);  
+            int canChooseRight = isPalindrome(s, leftInd + 1, rightInd);  
+            if(canChooseleft == -1 || canChooseRight == -1){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+    }
+    
+    int isPalindrome(string s, int b, int e){
+        int i = b, j = e;
+        for(i,j; i <= j; i++, j--){
+            if(s[i] != s[j]){
+                return i;
+            }
+        }
+        return -1; //成功
+    }
+};
