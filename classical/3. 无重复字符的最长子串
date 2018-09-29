@@ -1,0 +1,80 @@
+给定一个字符串，找出不含有重复字符的最长子串的长度。
+
+示例 1:
+
+输入: "abcabcbb"
+输出: 3 
+解释: 无重复字符的最长子串是 "abc"，其长度为 3。
+示例 2:
+
+输入: "bbbbb"
+输出: 1
+解释: 无重复字符的最长子串是 "b"，其长度为 1。
+示例 3:
+
+输入: "pwwkew"
+输出: 3
+解释: 无重复字符的最长子串是 "wke"，其长度为 3。
+     请注意，答案必须是一个子串，"pwke" 是一个子序列 而不是子串。
+/*
+  滑动窗口法[i,j),
+  关键点：原串的的最长一定是自部分最长的一部分
+*/
+
+class Solution {
+private:
+    unordered_set<char> Set;
+public:
+    int lengthOfLongestSubstring(string s) {
+        int i = 0, j = 0;
+        int len = 0;
+        int ans = 0;
+        int n = s.size();
+        while(i < n && j < n){  
+            char addChar = s[j];
+            if(Set.count(addChar) == 0){
+                len ++;
+                if(len > ans) ans = len;
+                Set.insert(addChar);
+                j++;
+            }
+            else{
+                len --;
+                Set.erase(s[i]);
+                i++;
+            }
+        }
+        return ans;
+    }
+};
+
+/*
+  更加优化的解法
+*/
+
+class Solution {
+private:
+    unordered_map<char, int> M;
+public:
+    int lengthOfLongestSubstring(string s) {
+        int i = 0;
+        int len = 0;
+        int ans = 0;
+        int n = s.size();
+        for(int j = 0; j < n; j ++){
+            char addChar = s[j]; 
+            if(M.find(addChar)== M.end() || M[addChar] < i){ //对于那些删除掉的元素，可以采用不理会的方式进行删除，而不是采用直接删除的方式 
+                M[addChar] = j;
+                len ++;
+                if(ans < len) ans = len;
+            }
+            else{
+                len -= M[addChar] + 1 - i;
+                i = M[addChar] + 1;
+                M[addChar] = j;
+                len ++;
+            }
+        }
+        return ans;
+    }
+};
