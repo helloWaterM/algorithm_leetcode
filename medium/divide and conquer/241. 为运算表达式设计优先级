@@ -1,0 +1,67 @@
+给定一个含有数字和运算符的字符串，为表达式添加括号，改变其运算优先级以求出不同的结果。你需要给出所有可能的组合的结果。有效的运算符号包含 +, - 以及 * 。
+
+示例 1:
+
+输入: "2-1-1"
+输出: [0, 2]
+解释: 
+((2-1)-1) = 0 
+(2-(1-1)) = 2
+示例 2:
+
+输入: "2*3-4*5"
+输出: [-34, -14, -10, -10, 10]
+解释: 
+(2*(3-(4*5))) = -34 
+((2*3)-(4*5)) = -14 
+((2*(3-4))*5) = -10 
+(2*((3-4)*5)) = -10 
+(((2*3)-4)*5) = 10
+
+class Solution {
+private:
+    unordered_map<string, vector<int>> S;
+public:
+    vector<int> diffWaysToCompute(string input) {
+        if(S.find(input) != S.end()){
+            return S[input];
+        }
+        int len = input.size();
+        vector<int> right;
+        vector<int> left;
+        vector<int> ans; 
+        bool isNum = true;
+        for(int i = 0; i < len; i++){
+            if(input[i] == '-' || input[i] == '+' || input[i] == '*'){
+                isNum = false;
+                right = diffWaysToCompute(input.substr(0, i));
+                left = diffWaysToCompute(input.substr(i + 1, len - i - 1));
+                int lenR =right.size();
+                int lenL = left.size();
+                for(int j = 0; j < lenR; j++){
+                    for(int s = 0; s < lenL; s++){
+                        int res;
+                        if(input[i] == '-'){
+                            res = right[j] - left[s];
+                        }
+                        else if(input[i] == '+'){
+                            res = right[j] + left[s]; 
+                        }
+                        else{
+                            res = right[j] * left[s];
+                        }
+                        ans.push_back(res);
+                    }
+                }
+            }       
+        }
+        if(isNum == true){
+            int res;
+            stringstream stream(input);  
+            stream>>res;  
+            ans.push_back(res);
+        }
+        S[input] = ans;
+        return ans;
+    }
+};
