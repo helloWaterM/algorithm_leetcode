@@ -1,0 +1,46 @@
+Given a binary tree, find its minimum depth.
+
+The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
+
+Note: A leaf is a node with no children.
+
+Example:
+
+Given binary tree [3,9,20,null,null,15,7],
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+return its minimum depth = 2.
+
+代码：
+这道题目当中的一个坑在于
+如果一个节点，它的左右子节点中有一个是NULL，那么就不能把那个子节点当作路径，只能把另外一个节点当作路径。
+            当左右子节点中两个都是NULL，那么就只有自己是路径。
+             其实就是NULL不能算作路径
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int minDepth(TreeNode* root) {
+        if(root == NULL) return 0;
+        int leftV = minDepth(root->left);
+        int rightV = minDepth(root->right);
+        if(min(leftV, rightV) == 0){
+            return max(leftV, rightV) + 1;
+        }
+        else{
+            return min(leftV, rightV) + 1;
+        }
+    }
+};
