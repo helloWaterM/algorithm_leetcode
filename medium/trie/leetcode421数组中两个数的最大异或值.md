@@ -34,6 +34,9 @@ MAX记录了最大的值，temp记录了可能可以作为新的答案的值，�
 (异或操作有这样的使用方式：A^B = C; 那么: A^C = B, B^C = A;)
 
 最后：算法的复杂度为 $O(62n) = O(n)$
+
+
+
 ```
 class Solution {
 public:
@@ -57,4 +60,7 @@ public:
 ​        return MAX;        
 ​    }
 };
+
+
 ```
+
